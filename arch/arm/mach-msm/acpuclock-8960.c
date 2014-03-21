@@ -120,6 +120,9 @@ static struct l2_level l2_freq_tbl[] __initdata = {
 #define AVS(x) .avsdscr_setting = (x)
 
 static struct acpu_level acpu_freq_tbl_slow[] __initdata = {
+#ifdef CONFIG_CPU_UNDERCLOCK
+	{ 1, {   192000, PLL_8, 0, 0x00 }, L2(0),   937500, AVS(0x40001F) },
+#endif
 	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(0),   950000, AVS(0x40001F) },
 	{ 0, {   432000, HFPLL, 2, 0x20 }, L2(6),   975000 },
 	{ 1, {   486000, HFPLL, 2, 0x24 }, L2(6),   975000 },
@@ -150,6 +153,9 @@ static struct acpu_level acpu_freq_tbl_slow[] __initdata = {
 };
 
 static struct acpu_level acpu_freq_tbl_nom[] __initdata = {
+#ifdef CONFIG_CPU_UNDERCLOCK
+	{ 1, {   192000, PLL_8, 0, 0x00 }, L2(0),   887500, AVS(0x40001F) },
+#endif
 	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(0),   900000, AVS(0x40007F) },
 	{ 0, {   432000, HFPLL, 2, 0x20 }, L2(6),   925000 },
 	{ 1, {   486000, HFPLL, 2, 0x24 }, L2(6),   925000 },
@@ -180,6 +186,9 @@ static struct acpu_level acpu_freq_tbl_nom[] __initdata = {
 };
 
 static struct acpu_level acpu_freq_tbl_fast[] __initdata = {
+#ifdef CONFIG_CPU_UNDERCLOCK
+	{ 1, {   192000, PLL_8, 0, 0x00 }, L2(0),   900000, AVS(0x40001F) },
+#endif
 	{ 1, {   384000, PLL_8, 0, 0x00 }, L2(0),   912500, AVS(0x4000FF) },
 	{ 0, {   432000, HFPLL, 2, 0x20 }, L2(6),   912500 },
 	{ 1, {   486000, HFPLL, 2, 0x24 }, L2(6),   912500 },
