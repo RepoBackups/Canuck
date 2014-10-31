@@ -145,6 +145,11 @@ config CPU_FREQ_DEFAULT_GOV_ELEMENTALX
 	help
 	  Use the CPUFreq governor 'elementalx' as default.
 
+config CPU_FREQ_DEFAULT_GOV_LIONHEART
+	bool "lionheart"
+	select CPU_FREQ_GOV_LIONHEART
+	help
+	Lionheart is a conservative-based governor which is based on samsung's update3 source
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -323,6 +328,7 @@ config CPU_FREQ_GOV_INTELLIMM
 
           If in doubt, say N.
 
+<<<<<<< HEAD
 config CPU_FREQ_GOV_ELEMENTALX
 	tristate "'elementalx' cpufreq policy governor"
 	select CPU_FREQ_TABLE
@@ -335,6 +341,11 @@ config CPU_FREQ_GOV_ELEMENTALX
 	  For details, take a look at linux/Documentation/cpu-freq.
 
 	  If in doubt, say N.
+=======
+config CPU_FREQ_GOV_LIONHEART
+	tristate "'lionheart' cpufreq governor"
+	depends on CPU_FREQ
+>>>>>>> f0d420d... introduce lionheart
 
 menu "x86 CPU frequency scaling drivers"
 depends on X86
