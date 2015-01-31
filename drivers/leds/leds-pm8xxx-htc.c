@@ -26,10 +26,6 @@
 #include <linux/mfd/pm8xxx/pwm.h>
 #include <linux/leds-pm8xxx-htc.h>
 
-#ifdef CONFIG_LEDS_PM8XXX_multiplier
-#include <linux/leds-pm8xxx-multiplier.h>
-#endif
-
 #ifdef CONFIG_BLN
 #include <linux/input.h>
 #include <linux/input/cy8c_cs.h>
@@ -69,13 +65,21 @@
 
 #define PM8XXX_LPG_CTL_REGS		7
 
+//#define LED_DEBUG
+#undef LED_DEBUG
+
+#ifndef LED_DEBUG
 #define LED_DBG(fmt, ...) \
 		({ if (0) printk(KERN_DEBUG "[LED]" fmt, ##__VA_ARGS__); })
 #define LED_INFO(fmt, ...) \
 		printk(KERN_INFO "[LED]" fmt, ##__VA_ARGS__)
 #define LED_ERR(fmt, ...) \
 		printk(KERN_ERR "[LED][ERR]" fmt, ##__VA_ARGS__)
-
+#else
+#define LED_DBG(fmt, ...)
+#define LED_INFO(fmt, ...)
+#define LED_ERR(fmt, ...)
+#endif
 static struct workqueue_struct *g_led_work_queue;
 static struct workqueue_struct *g_led_on_work_queue;
 struct wake_lock pmic_led_wake_lock;
@@ -87,7 +91,7 @@ static int lut_coefficient = 100;
 static int dutys_array[64];
 
 #ifdef CONFIG_BLN
-static int bln = 0; 
+int bln = 0;
 
 #ifdef CONFIG_CMDLINE_OPTIONS
 static int __init pm8xxx_read_blncfg_cmdline(char *blncfg)
@@ -149,7 +153,7 @@ void pm8xxx_led_current_set_for_key(int brightness_key)
 	LED_INFO("%s brightness_key: %d\n", __func__,brightness_key);
 
 #ifdef CONFIG_BLN
-	printk("[BB] current_set_for_key  %d \n", brightness_key); 
+	LED_INFO("[BB] current_set_for_key  %d \n", brightness_key); 
 #endif
 
 	if (brightness_key) {
@@ -471,7 +475,7 @@ static void pm8xxx_led_current_set(struct led_classdev *led_cdev, enum led_brigh
 	// checking for buttons device
 	if (led_cdev_buttons == led_cdev)
 	{
-		printk("[BB] led_current_set %d \n", brightness);
+		LED_INFO("[BB] led_current_set %d \n", brightness);
 		if (brightness>0)
 		{
 			// screen turning off together with buttons led
@@ -491,16 +495,16 @@ static void pm8xxx_buttons_blink(int on)
 {
 	if (on > 0)
 	{
-		printk("[BB] blink on  screen: %d j: %lu \n", touchscreen_is_on(), jiffies);
+		LED_INFO("[BB] blink on  screen: %d j: %lu \n", touchscreen_is_on(), jiffies);
 		if (buttons_led_is_on == 1) return; // already lit, dont blink
 		if (touchscreen_is_on() == 1) return; // touchscreen is on, dont blink
-		printk("[BLN] touchscreen_is_on(1): %d",touchscreen_is_on());
+		LED_INFO("[BLN] touchscreen_is_on(1): %d",touchscreen_is_on());
 		buttons_led_is_blinking = 1;
 		// start blinking (brightness = 1, blink flag needed = 1)
 		pm8xxx_led_current_set_flagged(led_cdev_buttons, 1, 1);
 	} else
 	{
-		printk("[BB] blink off  screen: %d j: %lu \n", touchscreen_is_on(), jiffies);
+		LED_INFO("[BB] blink off  screen: %d j: %lu \n", touchscreen_is_on(), jiffies);
 		if (buttons_led_is_blinking == 0) return;
 		buttons_led_is_blinking = 0;
 		if (touchscreen_is_on() == 1 && buttons_turning_on_with_screen_on == 1) return; // touchscreen is on, button light already override the blinking, dont turn off
@@ -710,7 +714,8 @@ static ssize_t pm8xxx_led_blink_store(struct device *dev,
 	struct led_classdev *led_cdev;
 	struct pm8xxx_led_data *ldata;
 	int val;
-	int level, offset;
+	int level;
+	int offset;
 
 	val = -1;
 	sscanf(buf, "%u", &val);
@@ -934,31 +939,8 @@ static ssize_t pm8xxx_led_off_timer_store(struct device *dev,
 	led_cdev = (struct led_classdev *) dev_get_drvdata(dev);
 	ldata = container_of(led_cdev, struct pm8xxx_led_data, cdev);
 
-#ifdef CONFIG_LEDS_PM8XXX_multiplier
-	switch (off_timer_multiplier) {
-		case OFF_TIMER_INFINITE:	{
-							/* If infinate notification set, don't set any timer */
-							LED_INFO("Not setting %s off_timer to %d min %d sec\n",
-											     led_cdev->name, min, sec);
-							return -EINVAL;
-						}
-		case OFF_TIMER_NORMAL:		{
-							LED_INFO("Setting %s off_timer to %d min %d sec\n",
-											   led_cdev->name, min, sec);
-
-							off_timer = min * 60 + sec;
-						}
-		default:			{
-							LED_INFO("Setting %s off_timer to %d min %d sec multiplied by %d\n",
-											   led_cdev->name, min, sec, off_timer_multiplier);
-
-							off_timer = (min * 60 + sec) * off_timer_multiplier;
-						}
-	}
-	#else
 	LED_INFO("Setting %s off_timer to %d min %d sec \n", led_cdev->name, min, sec);
 	off_timer = min * 60 + sec;
-	#endif
 
 	alarm_cancel(&ldata->led_alarm);
 	cancel_work_sync(&ldata->led_work);
