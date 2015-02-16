@@ -146,3 +146,4 @@ obj-$(CONFIG_CORESIGHT)		+= coresight/
 #sensor_class
 obj-$(CONFIG_SENSORS)		+= sensors/
 
+obj-$(CONFIG_KCONTROL_GPU_MODULE_MSM)   += gpu/
