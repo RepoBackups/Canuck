@@ -2992,28 +2992,27 @@ static struct platform_device msm_tsens_device = {
 static struct msm_thermal_data msm_thermal_pdata = {
 	.sensor_id = 0,
 #ifdef CONFIG_INTELLI_THERMAL
-        .poll_ms = 250,
-#ifdef CONFIG_CPU_OVERCLOCK
-        .limit_temp_degC = 70,
-#else
-        .limit_temp_degC = 60,
-#endif
-        .temp_hysteresis_degC = 10,
-        .freq_step = 2,
-        .freq_control_mask = 0xf,
-        .core_limit_temp_degC = 80,
-        .core_temp_hysteresis_degC = 10,
-        .core_control_mask = 0xe,
-#else
-	.poll_ms = 1000,
+	.poll_ms = 250,
 #ifdef CONFIG_CPU_OVERCLOCK
 	.limit_temp_degC = 70,
 #else
 	.limit_temp_degC = 60,
 #endif
 	.temp_hysteresis_degC = 10,
-//	.limit_freq = 918000,
 	.freq_step = 2,
+	.freq_control_mask = 0xf,
+	.core_limit_temp_degC = 80,
+	.core_temp_hysteresis_degC = 10,
+	.core_control_mask = 0xe,
+#else
+	.poll_ms = 1000,
+#ifdef CONFIG_CPU_OVERCLOCK
+	.limit_temp = 75,
+#else
+	.limit_temp = 60,
+#endif
+	.limit_freq = 918000,
+ 	.temp_hysteresis = 10,
 #endif
 };
 
@@ -3750,10 +3749,6 @@ static void msm_region_id_gpio_init(void)
 	gpio_tlmm_config(msm_region_gpio[0], GPIO_CFG_ENABLE);
 }
 
-#ifdef CONFIG_CPU_FREQ_GOV_INTELLIDEMAND 
-int id_set_two_phase_freq(int cpufreq);
-#endif
-
 #ifdef CONFIG_RAWCHIP
 static struct spi_board_info rawchip_spi_board_info[] __initdata = {
 	{
@@ -3841,10 +3836,6 @@ static void __init ville_init(void)
 
 //	create_proc_read_entry("emmc", 0, NULL, emmc_partition_read_proc, NULL);
 //	create_proc_read_entry("dying_processes", 0, NULL, dying_processors_read_proc, NULL);
-#ifdef CONFIG_CPU_FREQ_GOV_INTELLIDEMAND
-        if(!cpu_is_krait_v1())
-                id_set_two_phase_freq(1134000);
-#endif
 #ifdef CONFIG_CMDLINE_OPTIONS
 	/* setters for cmdline_gpu */
 	set_kgsl_3d0_freq(cmdline_3dgpu[0], cmdline_3dgpu[1], cmdline_3dgpu[2], cmdline_3dgpu[3]);
