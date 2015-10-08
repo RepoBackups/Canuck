@@ -3812,7 +3812,7 @@ static struct kgsl_device_platform_data kgsl_2d0_pdata = {
 	.set_grp_async = NULL,
 	.idle_timeout = HZ/5,
 #ifndef CONFIG_ARCH_APQ8064
-	.nap_allowed = true,
+	.nap_allowed = false,
 #endif
 	.clk_map = KGSL_CLK_CORE | KGSL_CLK_IFACE,
 #ifdef CONFIG_MSM_BUS_SCALING
@@ -3881,7 +3881,7 @@ static struct kgsl_device_platform_data kgsl_2d1_pdata = {
 	.set_grp_async = NULL,
 	.idle_timeout = HZ/5,
 #ifndef CONFIG_ARCH_APQ8064
-	.nap_allowed = true,
+	.nap_allowed = false,
 #endif
 	.clk_map = KGSL_CLK_CORE | KGSL_CLK_IFACE,
 #ifdef CONFIG_MSM_BUS_SCALING
